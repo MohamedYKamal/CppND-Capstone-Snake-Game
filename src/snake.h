@@ -6,27 +6,31 @@
 
 class Snake {
  public:
-  enum class Direction { kUp, kDown, kLeft, kRight };
+     enum class Direction
+     {
+         kUp,
+         kDown,
+         kLeft,
+         kRight,
+         kTerminate,
+         kTimeout
+     };
 
-  Snake(int grid_width, int grid_height)
-      : grid_width(grid_width),
-        grid_height(grid_height),
-        head_x(grid_width / 2),
-        head_y(grid_height / 2) {}
+     Snake(int grid_width, int grid_height) : grid_width(grid_width), grid_height(grid_height), head_x(grid_width / 2), head_y(grid_height / 2) {}
 
-  void Update();
+     void Update();
 
-  void GrowBody();
-  bool SnakeCell(int x, int y);
+     void GrowBody();
+     bool SnakeCell(int x, int y);
+     void Snake::ChangeDirection(Snake::Direction input, Snake::Direction opposite);
+     Direction direction = Direction::kUp;
 
-  Direction direction = Direction::kUp;
-
-  float speed{0.1f};
-  int size{1};
-  bool alive{true};
-  float head_x;
-  float head_y;
-  std::vector<SDL_Point> body;
+     float speed{0.1f};
+     int size{1};
+     bool alive{true};
+     float head_x;
+     float head_y;
+     std::vector<SDL_Point> body;
 
  private:
   void UpdateHead();

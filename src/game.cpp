@@ -2,28 +2,39 @@
 #include <iostream>
 #include "SDL.h"
 
-Game::Game(std::size_t grid_width, std::size_t grid_height)
+Game::Game(const std::size_t grid_width, const std::size_t grid_height,
+           const std::size_t screen_width, const std::size_t screen_height)
     : snake(grid_width, grid_height),
+      renderer(screen_width, screen_height, grid_width, grid_height),
       engine(dev()),
       random_w(0, static_cast<int>(grid_width)),
       random_h(0, static_cast<int>(grid_height)) {
   PlaceFood();
 }
-
-void Game::Run(Controller const &controller, Renderer &renderer,
-               std::size_t target_frame_duration) {
+~Game::Game() {
+  for (auto &i : RunningThreads) {
+    i.join();
+  }
+}
+void Game::Run(std::size_t target_frame_duration) {
   Uint32 title_timestamp = SDL_GetTicks();
   Uint32 frame_start;
   Uint32 frame_end;
   Uint32 frame_duration;
   int frame_count = 0;
   bool running = true;
-
+  controller.Launch(RunningThreads, running);
   while (running) {
     frame_start = SDL_GetTicks();
 
     // Input, Update, Render - the main game loop.
-    controller.HandleInput(running, snake);
+    Snake::Direction PressedKey = ControllerSnakeMapping(controller.GetKey());
+    if (PressedKey == Snake::Direction::kTerminate) {
+      running = false;
+    } else {
+      snake.ChangeDirection(PressedKey, GetOpposite(PressedKey));
+    }
+
     Update();
     renderer.Render(snake, food);
 
@@ -85,3 +96,49 @@ void Game::Update() {
 
 int Game::GetScore() const { return score; }
 int Game::GetSize() const { return snake.size; }
+
+Snake::Direction Game::ControllerSnakeMapping(SDL_Keycode in) {
+  switch (in) {
+    case SDLK_UP:
+      return Snake::Direction::kUp;
+      break;
+    case SDLK_DOWN:
+      return Snake::Direction::kDown;
+      break;
+    case SDLK_LEFT:
+      return Snake::Direction::kLeft;
+      break;
+    case SDLK_RIGHT:
+      return Snake::Direction::kRight;
+      break;
+    case SDLK_UNKNOWN:
+      return Snake::Direction::kTimeout;
+      break;
+    case SDLK_RETURN:
+      return Snake::Direction::kTerminate;
+      break;
+    default:
+      // discard
+      break;
+  }
+}
+
+Snake::Direction Game::GetOpposite(SDL_Keycode in) {
+  switch (in) {
+    case Snake::Direction::kUp:
+      return Snake::Direction::kDown;
+      break;
+    case Snake::Direction::kDown:
+      return Snake::Direction::kUp;
+      break;
+    case Snake::Direction::kLeft:
+      return Snake::Direction::kRight;
+      break;
+    case Snake::Direction::kRight:
+      return Snake::Direction::kLeft;
+      break;
+    default:
+      // discard
+      break;
+  }
+}

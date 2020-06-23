@@ -1,15 +1,17 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
+//Now the controller class can be used separately, with any game
 
-#include "snake.h"
+class Controller
+{
+public:
+    void Launch(std::vector<std::thread> &RunningThreads, bool &TermainateCondition);
+    SDL_Keycode GetKey();
 
-class Controller {
- public:
-  void HandleInput(bool &running, Snake &snake) const;
-
- private:
-  void ChangeDirection(Snake &snake, Snake::Direction input,
-                       Snake::Direction opposite) const;
+private:
+    void thread();
+    void HandleInput(bool &TermainateFlag);
+    MessageQueue<SDL_Keycode> Keys(25);
 };
 
 #endif

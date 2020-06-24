@@ -30,7 +30,7 @@ private:
     std::vector<std::thread> RunningThreads;
     int score{0};
     Snake::Direction ControllerSnakeMapping(SDL_Keycode);
-    Snake::Direction GetOpposite(SDL_Keycode in);
+    Snake::Direction GetOpposite(Snake::Direction in);
     void PlaceFood();
     void Update();
 };

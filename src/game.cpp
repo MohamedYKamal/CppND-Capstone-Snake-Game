@@ -1,7 +1,7 @@
 #include "game.h"
 #include <iostream>
 #include "SDL.h"
-
+#include <vector>
 Game::Game(const std::size_t grid_width, const std::size_t grid_height,
            const std::size_t screen_width, const std::size_t screen_height)
     : snake(grid_width, grid_height),
@@ -11,7 +11,7 @@ Game::Game(const std::size_t grid_width, const std::size_t grid_height,
       random_h(0, static_cast<int>(grid_height)) {
   PlaceFood();
 }
-~Game::Game() {
+Game::~Game() {
   for (auto &i : RunningThreads) {
     i.join();
   }
@@ -31,7 +31,13 @@ void Game::Run(std::size_t target_frame_duration) {
     Snake::Direction PressedKey = ControllerSnakeMapping(controller.GetKey());
     if (PressedKey == Snake::Direction::kTerminate) {
       running = false;
-    } else {
+    }
+    else if (PressedKey == Snake::Direction::kTimeout )
+    {
+
+    }
+    else
+    {
       snake.ChangeDirection(PressedKey, GetOpposite(PressedKey));
     }
 
@@ -123,7 +129,7 @@ Snake::Direction Game::ControllerSnakeMapping(SDL_Keycode in) {
   }
 }
 
-Snake::Direction Game::GetOpposite(SDL_Keycode in) {
+Snake::Direction Game::GetOpposite(Snake::Direction in) {
   switch (in) {
     case Snake::Direction::kUp:
       return Snake::Direction::kDown;

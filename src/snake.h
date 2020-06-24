@@ -22,7 +22,7 @@ class Snake {
 
      void GrowBody();
      bool SnakeCell(int x, int y);
-     void Snake::ChangeDirection(Snake::Direction input, Snake::Direction opposite);
+     void ChangeDirection(Snake::Direction input, Snake::Direction opposite);
      Direction direction = Direction::kUp;
 
      float speed{0.1f};
